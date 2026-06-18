@@ -1,0 +1,62 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Build outputs
+android/app/build/
+android/.gradle/
+android/build/
+android/captures/
+android/gradlew
+android/gradlew.bat
+android/gradle/wrapper/
+ios/build/
+ios/DerivedData/
+ios/Pods/
+
+# Metro
+.metro-health-check*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Testing
+coverage/
+.nyc_output/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Downloaded media (optional - commit if you want)
+# *.mp3
+# *.m4a
+# *.ogg
+# downloads/

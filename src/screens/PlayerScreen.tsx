@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useRef} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, ScrollView, PanResponder, LayoutChangeEvent} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, ScrollView, PanResponder, LayoutChangeEvent, Alert} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import TrackPlayer, {State, usePlaybackState, useProgress} from 'react-native-track-player';
@@ -40,9 +40,13 @@ const PlayerScreen = () => {
   }, [currentTrack]);
 
   const handleLike = async () => {
-    const {user} = useAuthStore.getState();
+    const {user, isGuest} = useAuthStore.getState();
+    if (isGuest) {
+      Alert.alert('Mode invité', 'Connecte-toi pour aimer des titres.');
+      return;
+    }
     if (!user || !currentTrack) return;
-    
+
     if (isLiked) {
       await unlikeTrack(user.id, currentTrack.id);
     } else {
@@ -52,6 +56,11 @@ const PlayerScreen = () => {
   };
 
   const handleDownload = async () => {
+    const {isGuest} = useAuthStore.getState();
+    if (isGuest) {
+      Alert.alert('Mode invité', 'Connecte-toi pour télécharger des titres.');
+      return;
+    }
     if (!currentTrack) return;
     if (isDownloadedState) {
       await removeDownload(currentTrack.id);

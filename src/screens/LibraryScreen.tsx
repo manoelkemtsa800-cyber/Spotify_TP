@@ -16,13 +16,14 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import type {RootStackParamList} from '../types';
 import {useAuthStore, useMusicStore} from '../store';
 import MiniPlayer from '../components/MiniPlayer';
+import GuestRestricted from '../components/GuestRestricted';
 import type {Playlist} from '../types';
 
 type LibraryNavProp = NativeStackNavigationProp<RootStackParamList, 'Main'>;
 
 const LibraryScreen = () => {
   const navigation = useNavigation<LibraryNavProp>();
-  const {user} = useAuthStore();
+  const {user, isGuest} = useAuthStore();
   const {
     playlists,
     playlistsLoading,
@@ -40,6 +41,15 @@ const LibraryScreen = () => {
       fetchUserPlaylists(user.id);
     }
   }, [user]);
+
+  if (isGuest) {
+    return (
+      <GuestRestricted
+        icon="library-outline"
+        message="Connecte-toi pour créer des playlists et organiser ta musique."
+      />
+    );
+  }
 
   const handleCreatePlaylist = async () => {
     if (!newPlaylistName.trim()) {

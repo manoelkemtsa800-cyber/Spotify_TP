@@ -1,18 +1,29 @@
 import React, {useEffect} from 'react';
 import {View, Text, StyleSheet, FlatList, TouchableOpacity, Alert} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {useDownloadStore, usePlayerStore} from '../store';
+import {useDownloadStore, usePlayerStore, useAuthStore} from '../store';
 import type {DownloadedTrack, Track} from '../types';
 import TrackRow from '../components/TrackRow';
 import MiniPlayer from '../components/MiniPlayer';
+import GuestRestricted from '../components/GuestRestricted';
 
 const DownloadsScreen = () => {
+  const {isGuest} = useAuthStore();
   const {downloads, loadDownloads, removeDownload, clearAllDownloads} = useDownloadStore();
   const {queueAndPlay, currentTrack, miniPlayerVisible} = usePlayerStore();
 
   useEffect(() => {
-    loadDownloads();
-  }, []);
+    if (!isGuest) loadDownloads();
+  }, [isGuest]);
+
+  if (isGuest) {
+    return (
+      <GuestRestricted
+        icon="download-outline"
+        message="Connecte-toi pour télécharger des titres et les écouter hors ligne."
+      />
+    );
+  }
 
   const handlePlayTrack = (track: Track, index: number, tracks: Track[]) => {
     queueAndPlay(tracks, index);

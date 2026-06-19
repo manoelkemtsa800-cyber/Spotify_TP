@@ -22,7 +22,7 @@ type HomeNavProp = NativeStackNavigationProp<RootStackParamList, 'Main'>;
 
 const HomeScreen = () => {
   const navigation = useNavigation<HomeNavProp>();
-  const {user} = useAuthStore();
+  const {user, isGuest} = useAuthStore();
   const {
     allTracks,
     popularTracks,
@@ -159,7 +159,7 @@ const HomeScreen = () => {
                 track={track}
                 index={index + 1}
                 onPress={() => handlePlayTrack(track, popularTracks, index)}
-                onDownload={() => handleDownload(track)}
+                onDownload={isGuest ? undefined : () => handleDownload(track)}
                 isDownloaded={isDownloaded(track.id)}
                 downloadProgress={downloading[track.id] || 0}
               />
@@ -177,7 +177,7 @@ const HomeScreen = () => {
                 track={track}
                 index={index + 1}
                 onPress={() => handlePlayTrack(track, allTracks, index)}
-                onDownload={() => handleDownload(track)}
+                onDownload={isGuest ? undefined : () => handleDownload(track)}
                 isDownloaded={isDownloaded(track.id)}
                 downloadProgress={downloading[track.id] || 0}
               />

@@ -6,6 +6,7 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {useAuthStore} from './src/store';
 import AppNavigator from './src/navigation/AppNavigator';
+import OfflineBanner from './src/components/OfflineBanner';
 
 // Service de playback en arrière-plan
 TrackPlayer.registerPlaybackService(() => require('./src/services/playerService').playbackService);
@@ -58,6 +59,7 @@ const App = () => {
   return (
     <GestureHandlerRootView style={styles.root}>
       <SafeAreaProvider>
+        <OfflineBanner />
         <AppNavigator />
       </SafeAreaProvider>
     </GestureHandlerRootView>

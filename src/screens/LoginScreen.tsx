@@ -21,7 +21,7 @@ type AuthNavProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 
 const LoginScreen = () => {
   const navigation = useNavigation<AuthNavProp>();
-  const {signIn, loading} = useAuthStore();
+  const {signIn, loading, continueAsGuest} = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -124,6 +124,20 @@ const LoginScreen = () => {
               <Text style={styles.registerTextBold}>S'inscrire</Text>
             </Text>
           </TouchableOpacity>
+
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>ou</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          <TouchableOpacity style={styles.guestButton} onPress={continueAsGuest}>
+            <Icon name="headset-outline" size={18} color="#fff" />
+            <Text style={styles.guestButtonText}>Continuer sans compte</Text>
+          </TouchableOpacity>
+          <Text style={styles.guestHint}>
+            Mode invité : écoute uniquement, sans favoris ni téléchargements
+          </Text>
         </View>
       </Animated.View>
     </KeyboardAvoidingView>
@@ -160,6 +174,32 @@ const styles = StyleSheet.create({
   registerButton: {alignItems: 'center', marginTop: 20},
   registerButtonText: {color: '#888', fontSize: 14},
   registerTextBold: {color: '#1DB954', fontWeight: 'bold'},
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 25,
+    marginBottom: 5,
+  },
+  dividerLine: {flex: 1, height: 1, backgroundColor: '#333'},
+  dividerText: {color: '#666', marginHorizontal: 12, fontSize: 13},
+  guestButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#444',
+    borderRadius: 25,
+    paddingVertical: 14,
+  },
+  guestButtonText: {color: '#fff', fontSize: 15, fontWeight: '600'},
+  guestHint: {
+    color: '#666',
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: 10,
+  },
 });
 
 export default LoginScreen;

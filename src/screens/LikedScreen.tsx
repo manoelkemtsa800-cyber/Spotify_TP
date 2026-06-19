@@ -5,15 +5,25 @@ import {useAuthStore, useMusicStore, usePlayerStore} from '../store';
 import type {Track} from '../types';
 import TrackRow from '../components/TrackRow';
 import MiniPlayer from '../components/MiniPlayer';
+import GuestRestricted from '../components/GuestRestricted';
 
 const LikedScreen = () => {
-  const {user} = useAuthStore();
+  const {user, isGuest} = useAuthStore();
   const {likedTracks, likedLoading, fetchLikedTracks} = useMusicStore();
   const {queueAndPlay, currentTrack, miniPlayerVisible} = usePlayerStore();
 
   useEffect(() => {
     if (user) fetchLikedTracks(user.id);
   }, [user]);
+
+  if (isGuest) {
+    return (
+      <GuestRestricted
+        icon="heart-outline"
+        message="Connecte-toi pour aimer des titres et retrouver tes favoris ici."
+      />
+    );
+  }
 
   const handlePlayTrack = (track: Track, index: number) => {
     queueAndPlay(likedTracks, index);

@@ -10,7 +10,7 @@ import {
   Keyboard,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {useMusicStore, usePlayerStore, useDownloadStore} from '../store';
+import {useMusicStore, usePlayerStore, useDownloadStore, useAuthStore} from '../store';
 import type {Track} from '../types';
 import TrackRow from '../components/TrackRow';
 import MiniPlayer from '../components/MiniPlayer';
@@ -27,6 +27,7 @@ const CATEGORIES = [
 ];
 
 const SearchScreen = () => {
+  const {isGuest} = useAuthStore();
   const {searchTracks, searchResults, isSearching} = useMusicStore();
   const {queueAndPlay, currentTrack, miniPlayerVisible} = usePlayerStore();
   const {downloadTrack, isDownloaded, downloading} = useDownloadStore();
@@ -119,7 +120,7 @@ const SearchScreen = () => {
                 track={item}
                 index={index + 1}
                 onPress={() => handlePlayTrack(item, index)}
-                onDownload={() => handleDownload(item)}
+                onDownload={isGuest ? undefined : () => handleDownload(item)}
                 isDownloaded={isDownloaded(item.id)}
                 downloadProgress={downloading[item.id] || 0}
               />

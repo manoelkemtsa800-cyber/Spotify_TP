@@ -1,4 +1,5 @@
 import React from 'react';
+import {View} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
@@ -6,6 +7,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 import {useAuthStore} from '../store';
 import type {RootStackParamList, MainTabParamList} from '../types';
+import OfflineBanner from '../components/OfflineBanner';
 
 // Auth Screens
 import LoginScreen from '../screens/LoginScreen';
@@ -89,37 +91,40 @@ function MainTabs() {
 
 // ==================== ROOT NAVIGATOR ====================
 function AppNavigator() {
-  const {user, initialized} = useAuthStore();
+  const {user, isGuest, initialized} = useAuthStore();
 
   if (!initialized) {
     return null; // ou un splash screen
   }
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-          contentStyle: {backgroundColor: '#121212'},
-        }}>
-        {user ? (
-          <>
-            <Stack.Screen name="Main" component={MainTabs} />
-            <Stack.Screen
-              name="Player"
-              component={PlayerScreen}
-              options={{
-                animation: 'slide_from_bottom',
-                presentation: 'modal',
-              }}
-            />
-            <Stack.Screen name="PlaylistDetail" component={PlaylistDetailScreen} />
-          </>
-        ) : (
-          <Stack.Screen name="Auth" component={AuthStack} />
-        )}
-      </Stack.Navigator>
-    </NavigationContainer>
+    <View style={{flex: 1}}>
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+            contentStyle: {backgroundColor: '#121212'},
+          }}>
+          {user || isGuest ? (
+            <>
+              <Stack.Screen name="Main" component={MainTabs} />
+              <Stack.Screen
+                name="Player"
+                component={PlayerScreen}
+                options={{
+                  animation: 'slide_from_bottom',
+                  presentation: 'modal',
+                }}
+              />
+              <Stack.Screen name="PlaylistDetail" component={PlaylistDetailScreen} />
+            </>
+          ) : (
+            <Stack.Screen name="Auth" component={AuthStack} />
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
+      <OfflineBanner />
+    </View>
   );
 }
 

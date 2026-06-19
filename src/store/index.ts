@@ -17,16 +17,19 @@ interface AuthState {
   user: User | null;
   loading: boolean;
   initialized: boolean;
+  isGuest: boolean;
   initialize: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<boolean>;
   signUp: (email: string, password: string, name: string) => Promise<boolean>;
   signOut: () => Promise<void>;
+  continueAsGuest: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   loading: false,
   initialized: false,
+  isGuest: false,
 
   initialize: async () => {
     try {
@@ -40,21 +43,25 @@ export const useAuthStore = create<AuthState>((set) => ({
   signIn: async (email, password) => {
     set({loading: true});
     const {user, error} = await auth.signIn(email, password);
-    set({user, loading: false});
+    set({user, loading: false, isGuest: false});
     return !!user && !error;
   },
 
   signUp: async (email, password, name) => {
     set({loading: true});
     const {user, error} = await auth.signUp(email, password, name);
-    set({user, loading: false});
+    set({user, loading: false, isGuest: false});
     return !!user && !error;
   },
 
   signOut: async () => {
     set({loading: true});
     await auth.signOut();
-    set({user: null, loading: false});
+    set({user: null, loading: false, isGuest: false});
+  },
+
+  continueAsGuest: () => {
+    set({user: null, isGuest: true, initialized: true});
   },
 }));
 

@@ -1,5 +1,5 @@
 import {create} from 'zustand';
-import TrackPlayer, {State, Track as TPTrack, usePlaybackState, useProgress} from 'react-native-track-player';
+import TrackPlayer, {Track as TPTrack} from 'react-native-track-player';
 import * as auth from './authService';
 import * as music from './musicService';
 import * as player from './playerService';
@@ -198,6 +198,7 @@ interface PlayerStoreState {
   currentPosition: number;
   currentDuration: number;
   currentQueue: Track[];
+  currentTrack: Track | null;
   currentTrackIndex: number;
   isShuffle: boolean;
   repeatMode: RepeatMode;
@@ -222,6 +223,7 @@ export const usePlayerStore = create<PlayerStoreState>((set, get) => ({
   currentDuration: 0,
   currentQueue: [],
   currentTrackIndex: 0,
+  currentTrack: null,
   isShuffle: false,
   repeatMode: 'off',
   miniPlayerVisible: false,
@@ -261,12 +263,13 @@ export const usePlayerStore = create<PlayerStoreState>((set, get) => ({
     await TrackPlayer.skip(startIndex);
     await TrackPlayer.play();
 
-    set({
-      currentQueue: tracks,
-      currentTrackIndex: startIndex,
-      isPlaying: true,
-      miniPlayerVisible: true,
-    });
+   set({
+     currentQueue: tracks,
+     currentTrackIndex: startIndex,
+     currentTrack: tracks[startIndex] || null,
+     isPlaying: true,
+     miniPlayerVisible: true,
+   });
   },
 
   playTrack: async (track, queue, startIndex = 0) => {
@@ -337,7 +340,7 @@ export const usePlayerStore = create<PlayerStoreState>((set, get) => ({
 
   toggleRepeat: () => {
     set((state) => {
-      const modes: RepeatMode[] = ['off', 'one', 'all'];
+      const modes: RepeatMode[] = [RepeatMode.OFF, RepeatMode.ONE, RepeatMode.ALL];
       const currentIndex = modes.indexOf(state.repeatMode);
       const nextMode = modes[(currentIndex + 1) % modes.length];
       return {repeatMode: nextMode};

@@ -17,8 +17,11 @@ jobs:
           node-version: '18'
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install JS dependencies
         run: npm install
+
+      - name: Verify react-native gradle plugin exists
+        run: ls node_modules/@react-native/gradle-plugin
 
       - name: Setup Java 17
         uses: actions/setup-java@v4

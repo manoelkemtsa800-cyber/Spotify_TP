@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, ScrollView} from 'react-native';
+import React, {useEffect, useState, useRef} from 'react';
+import {View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, ScrollView, PanResponder, LayoutChangeEvent} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import TrackPlayer, {State, usePlaybackState, useProgress} from 'react-native-track-player';
-import {useMusicStore, usePlayerStore, useDownloadStore} from '../store';
+import {useMusicStore, usePlayerStore, useDownloadStore, useAuthStore} from '../store';
 import {supabase, STORAGE_AUDIO_BUCKET, STORAGE_COVER_BUCKET} from '../services/supabase';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import type {RootStackParamList} from '../types';
@@ -20,6 +20,9 @@ const PlayerScreen = () => {
   const progress = useProgress();
   const [isLiked, setIsLiked] = useState(false);
   const [isDownloadedState, setIsDownloadedState] = useState(false);
+  const [isSeeking, setIsSeeking] = useState(false);
+  const [seekPosition, setSeekPosition] = useState(0);
+  const progressBarWidth = useRef(0);
 
   useEffect(() => {
     updateProgress(progress.position, progress.duration);
@@ -57,6 +60,36 @@ const PlayerScreen = () => {
       const success = await downloadTrack(currentTrack);
       if (success) setIsDownloadedState(true);
     }
+  };
+
+  const progressPanResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: (evt) => {
+        setIsSeeking(true);
+        const x = evt.nativeEvent.locationX;
+        const ratio = Math.max(0, Math.min(1, x / progressBarWidth.current));
+        setSeekPosition(ratio);
+      },
+      onPanResponderMove: (evt) => {
+        const x = evt.nativeEvent.locationX;
+        const ratio = Math.max(0, Math.min(1, x / progressBarWidth.current));
+        setSeekPosition(ratio);
+      },
+      onPanResponderRelease: (evt) => {
+        const x = evt.nativeEvent.locationX;
+        const ratio = Math.max(0, Math.min(1, x / progressBarWidth.current));
+        const {currentDuration} = usePlayerStore.getState();
+        seekTo(ratio * currentDuration);
+        setIsSeeking(false);
+      },
+    }),
+  ).current;
+
+  const getProgressRatio = () => {
+    if (isSeeking) return seekPosition;
+    return currentDuration > 0 ? currentPosition / currentDuration : 0;
   };
 
   const formatTime = (seconds: number) => {
@@ -109,14 +142,27 @@ const PlayerScreen = () => {
         </Text>
       </View>
 
-      {/* Progress Bar */}
+      {/* Progress Bar Interactive */}
       <View style={styles.progressContainer}>
-        <Text style={styles.timeText}>{formatTime(currentPosition)}</Text>
-        <View style={styles.progressBar}>
+        <Text style={styles.timeText}>
+          {formatTime(isSeeking ? seekPosition * currentDuration : currentPosition)}
+        </Text>
+        <View
+          style={styles.progressBar}
+          onLayout={(e: LayoutChangeEvent) => {
+            progressBarWidth.current = e.nativeEvent.layout.width;
+          }}
+          {...progressPanResponder.panHandlers}>
           <View
             style={[
               styles.progressFill,
-              {width: `${currentDuration > 0 ? (currentPosition / currentDuration) * 100 : 0}%`},
+              {width: `${getProgressRatio() * 100}%`},
+            ]}
+          />
+          <View
+            style={[
+              styles.progressThumb,
+              {left: `${getProgressRatio() * 100}%`},
             ]}
           />
         </View>
@@ -145,14 +191,16 @@ const PlayerScreen = () => {
         <TouchableOpacity style={styles.controlButton} onPress={skipToNext}>
           <Icon name="play-skip-forward" size={30} color="#fff" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.controlButton} onPress={toggleRepeat}>
+        <TouchableOpacity style={[styles.controlButton, styles.repeatButton]} onPress={toggleRepeat}>
           <Icon
-            name={repeatMode === 'off' ? 'repeat' : repeatMode === 'one' ? 'repeat' : 'repeat'}
+            name="repeat"
             size={24}
             color={repeatMode !== 'off' ? '#1DB954' : '#888'}
           />
           {repeatMode === 'one' && (
-            <Text style={styles.repeatOneText}>1</Text>
+            <View style={styles.repeatOneBadge}>
+              <Text style={styles.repeatOneText}>1</Text>
+            </View>
           )}
         </TouchableOpacity>
       </View>
@@ -282,11 +330,33 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 5,
   },
-  repeatOneText: {
+  repeatButton: {
+    position: 'relative',
+  },
+  repeatOneBadge: {
     position: 'absolute',
-    fontSize: 10,
-    color: '#1DB954',
+    top: 4,
+    right: 4,
+    backgroundColor: '#1DB954',
+    borderRadius: 6,
+    width: 12,
+    height: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  repeatOneText: {
+    fontSize: 8,
+    color: '#000',
     fontWeight: 'bold',
+  },
+  progressThumb: {
+    position: 'absolute',
+    top: -6,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: '#fff',
+    marginLeft: -7,
   },
   bottomActions: {
     flexDirection: 'row',

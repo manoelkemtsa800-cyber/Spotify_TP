@@ -6,8 +6,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // Obtenez-les sur https://app.supabase.com
 // ============================================
 
-export const SUPABASE_URL = 'https://VOTRE_PROJET.supabase.co';
-export const SUPABASE_ANON_KEY = 'VOTRE_CLE_ANON_PUBLIQUE';
+export const SUPABASE_URL = 'https://txxwwmdqfufanbxyltyy.supabase.co';
+export const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR4eHd3bWRxZnVmYW5ieHlsdHl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MTI3MDUsImV4cCI6MjA5NzM4ODcwNX0.vA9lk8vO8nhb_HO10kr0CIgAiYM8XufdjvXMDkeV_yY';
 
 // Storage Buckets
 export const STORAGE_AUDIO_BUCKET = 'audio-files';

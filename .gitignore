@@ -7,9 +7,6 @@ android/app/build/
 android/.gradle/
 android/build/
 android/captures/
-android/gradlew
-android/gradlew.bat
-android/gradle/wrapper/
 ios/build/
 ios/DerivedData/
 ios/Pods/

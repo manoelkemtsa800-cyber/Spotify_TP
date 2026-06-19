@@ -1,11 +1,11 @@
 import {create} from 'zustand';
-import TrackPlayer, {State, Track as TPTrack, usePlaybackState, useProgress} from 'react-native-track-player';
+import TrackPlayer, {Track as TPTrack} from 'react-native-track-player';
 import * as auth from '../services/authService';
 import * as music from '../services/musicService';
 import * as player from '../services/playerService';
 import * as download from '../services/downloadService';
 import type {User, Track, Playlist, UserLikedTrack, DownloadedTrack, RepeatMode, QueueItem} from '../types';
-import {supabase, STORAGE_AUDIO_BUCKET} from './supabase';
+import {supabase, STORAGE_AUDIO_BUCKET} from '../services/supabase';
 import RNFS from 'react-native-fs';
 import RNFetchBlob from 'react-native-blob-util';
 

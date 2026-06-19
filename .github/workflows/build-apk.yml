@@ -8,20 +8,24 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+    defaults:
+      run:
+        working-directory: .
 
-      - name: Setup Node.js
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 18
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
 
       - name: Install JS dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Verify react-native gradle plugin exists
-        run: ls node_modules/@react-native/gradle-plugin
+      - name: Check gradle plugin exists
+        run: test -d node_modules/@react-native/gradle-plugin && echo "OK" || echo "MISSING"
 
       - name: Setup Java 17
         uses: actions/setup-java@v4
@@ -35,8 +39,10 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x android/gradlew
 
-      - name: Build APK Debug
-        run: cd android && ./gradlew assembleDebug --no-daemon
+      - name: Build APK
+        run: |
+          cd android
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4

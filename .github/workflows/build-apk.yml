@@ -30,15 +30,29 @@ jobs:
       - name: Install JS dependencies
         run: npm install
 
+      - name: Verify gradle plugin path
+        run: |
+          echo "Checking node_modules..."
+          ls node_modules/@react-native/gradle-plugin
+          echo "PATH OK"
+
       - name: Make gradlew executable
         run: chmod +x android/gradlew
 
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ hashFiles('**/*.gradle*') }}
+
       - name: Build APK Debug
-        run: |
-          cd android
-          ./gradlew assembleDebug --no-daemon
+        run: ./gradlew assembleDebug --no-daemon
+        working-directory: android
 
       - name: Chercher APK
+        if: always()
         run: find . -name "*.apk" 2>/dev/null
 
       - name: Upload APK
